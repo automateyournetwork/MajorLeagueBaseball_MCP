@@ -1,4 +1,6 @@
 import logging
+import httpx
+from contextlib import asynccontextmanager
 from pydantic import BaseModel, Field
 from typing import Dict, Any, Optional
 from mcp.server.fastmcp import FastMCP
@@ -6,14 +8,24 @@ from mcp.server.fastmcp import FastMCP
 logging.basicConfig(level=logging.INFO, format="%(asctime)s - %(threadName)s - %(name)s - %(levelname)s - %(message)s")
 logger = logging.getLogger("MLBMCPServer")
 
+# HTTP Client setup
+@asynccontextmanager
+async def get_http_client():
+    async with httpx.AsyncClient() as client:
+        yield client
+
+# Global variables
 MLB_BASE = "https://statsapi.mlb.com/api/v1"
-headers = {
+HEADERS = {
     'Accept': 'application/json',
     'Content-Type': 'application/json',
 }
 
 # --- FastMCP Server ---
 mcp = FastMCP("MLB Server")
+
+# HTTP client instance
+http_client = httpx.AsyncClient()
 
 # ------------------------------- Tool Input Schemas -------------------------------
 
